@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employees Directory</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f7f8fa;
+    }
+    h1 {
+      color: #2d3748;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #edf2f7;
+    }
+    form {
+      margin-top: 30px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 50%;
+    }
+    input {
+      margin: 5px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #3182ce;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2b6cb0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Employees Directory</h1>
+  <p>This app is connected to MySQL and running inside Kubernetes.</p>
+
+  <table id="employeeTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Department</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <form id="addEmployeeForm">
+    <h3>Add a new employee</h3>
+    <input type="text" id="name" placeholder="Name" required />
+    <input type="text" id="role" placeholder="Role" required />
+    <input type="text" id="department" placeholder="Department" required />
+    <button type="submit">Add Employee</button>
+  </form>
+
+  <script>
+    const apiBase = window.location.origin;
+
+    async function loadEmployees() {
+      const res = await fetch(`${apiBase}/employees`);
+      const data = await res.json();
+      const tbody = document.querySelector('#employeeTable tbody');
+      tbody.innerHTML = '';
+      data.forEach(emp => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${emp.id}</td><td>${emp.name}</td><td>${emp.role}</td><td>${emp.department}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('addEmployeeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const role = document.getElementById('role').value;
+      const department = document.getElementById('department').value;
+      await fetch(`${apiBase}/employees`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, role, department })
+      });
+      e.target.reset();
+      loadEmployees();
+    });
+
+    loadEmployees();
+  </script>
+</body>
+</html>
+
