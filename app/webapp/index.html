@@ -1,65 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Employees Directory</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employees App</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 40px;
-      background-color: #f7f8fa;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 20px;
     }
     h1 {
-      color: #2d3748;
+      text-align: center;
+      color: #333;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     th, td {
-      border: 1px solid #e2e8f0;
-      padding: 12px;
+      border: 1px solid #ccc;
+      padding: 10px;
       text-align: left;
     }
     th {
-      background-color: #edf2f7;
+      background: #007bff;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f2f2f2;
     }
     form {
       margin-top: 30px;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      width: 50%;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
     }
     input {
-      margin: 5px;
       padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      width: 200px;
     }
     button {
-      background-color: #3182ce;
+      background-color: #007bff;
       color: white;
       border: none;
-      padding: 10px 16px;
-      border-radius: 4px;
+      padding: 8px 16px;
       cursor: pointer;
     }
     button:hover {
-      background-color: #2b6cb0;
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <h1>Employees Directory</h1>
-  <p>This app is connected to MySQL and running inside Kubernetes.</p>
+  <h1>Employees Management</h1>
 
-  <table id="employeeTable">
+  <table id="employeesTable">
     <thead>
       <tr>
         <th>ID</th>
@@ -71,39 +69,46 @@
     <tbody></tbody>
   </table>
 
-  <form id="addEmployeeForm">
-    <h3>Add a new employee</h3>
-    <input type="text" id="name" placeholder="Name" required />
-    <input type="text" id="role" placeholder="Role" required />
-    <input type="text" id="department" placeholder="Department" required />
+  <form id="employeeForm">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="role" placeholder="Role" required>
+    <input type="text" id="department" placeholder="Department" required>
     <button type="submit">Add Employee</button>
   </form>
 
   <script>
-    const apiBase = window.location.origin;
+    const API = '/employees';
 
     async function loadEmployees() {
-      const res = await fetch(`${apiBase}/employees`);
+      const res = await fetch(API);
       const data = await res.json();
-      const tbody = document.querySelector('#employeeTable tbody');
+      const tbody = document.querySelector('#employeesTable tbody');
       tbody.innerHTML = '';
       data.forEach(emp => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${emp.id}</td><td>${emp.name}</td><td>${emp.role}</td><td>${emp.department}</td>`;
-        tbody.appendChild(tr);
+        const row = `<tr>
+          <td>${emp.id}</td>
+          <td>${emp.name}</td>
+          <td>${emp.role}</td>
+          <td>${emp.department}</td>
+        </tr>`;
+        tbody.insertAdjacentHTML('beforeend', row);
       });
     }
 
-    document.getElementById('addEmployeeForm').addEventListener('submit', async (e) => {
+    document.getElementById('employeeForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const name = document.getElementById('name').value;
-      const role = document.getElementById('role').value;
-      const department = document.getElementById('department').value;
-      await fetch(`${apiBase}/employees`, {
+      const name = document.getElementById('name').value.trim();
+      const role = document.getElementById('role').value.trim();
+      const department = document.getElementById('department').value.trim();
+
+      if (!name || !role || !department) return alert('Please fill all fields');
+
+      await fetch(API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, role, department })
       });
+
       e.target.reset();
       loadEmployees();
     });
@@ -112,4 +117,3 @@
   </script>
 </body>
 </html>
-
