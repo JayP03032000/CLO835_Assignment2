@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: employees-pod
+  namespace: web
+  labels:
+    app: employees
+spec:
+  containers:
+    - name: employees
+      image: employees-app:local
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 8080
+      env:
+        - name: DB_HOST
+          value: "mysql.db.svc.cluster.local"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: password
+        - name: DB_NAME
+          value: "employeesdb"
+      securityContext:
+        runAsUser: 1000
+

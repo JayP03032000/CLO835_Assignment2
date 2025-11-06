@@ -1,0 +1,6 @@
+.terraform/
+*.zip
+*.log
+*.tar
+*.gz
+terraform/
