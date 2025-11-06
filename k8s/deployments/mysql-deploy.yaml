@@ -16,6 +16,8 @@ spec:
       containers:
         - name: mysql
           image: public.ecr.aws/docker/library/mysql:8.0
+          ports:
+            - containerPort: 3306
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
@@ -24,5 +26,11 @@ spec:
                   key: password
             - name: MYSQL_DATABASE
               value: employeesdb
-          ports:
-            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+
